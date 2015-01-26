@@ -1,6 +1,6 @@
 {
   "name": "codexen",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Code storage service",
   "main": "index.js",
   "bin": {
@@ -20,5 +20,9 @@
   "dependencies": {
     "commander": "^2.6.0",
     "request": "^2.51.0"
+  },
+  "repository" :
+  { "type" : "git"
+  , "url" : "https://github.com/laravelfanatic/codexen.git"
   }
 }
