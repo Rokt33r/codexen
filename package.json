@@ -1,0 +1,24 @@
+{
+  "name": "codexen",
+  "version": "0.0.1",
+  "description": "Code storage service",
+  "main": "index.js",
+  "bin": {
+    "cx": "./index.js",
+    "cx-config": "./config.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "codexen",
+    "cx",
+    "tempate"
+  ],
+  "author": "Dick Choi <fluke8259@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.6.0",
+    "request": "^2.51.0"
+  }
+}
