@@ -3,8 +3,9 @@
 var program = require('commander');
 var fs = require('fs');
 var readline = require('readline');
+var path = require('path');
 
-var supplies;
+var supplies, codes;
 
 program
     .version('0.0.1')
@@ -14,8 +15,9 @@ program
 
 fs.readFile('./codexen.json', {encoding: 'utf-8'}, function (err, data) {
     if (err) throw err;
-    var depot = JSON.parse(data);
-    supplies = depot.supplies;
+    var result = JSON.parse(data);
+    supplies = result.depot.supplies;
+    codes = result.codes;
 
     if(program.args[0]) {
         executeGenerator(program.args[0], program.args[1]);
@@ -45,16 +47,24 @@ fs.readFile('./codexen.json', {encoding: 'utf-8'}, function (err, data) {
 var executeGenerator = function(command, overrideFilename){
     supplies.forEach(function (supply) {
         if (supply.command == command) {
-            var code = supply.code;
+            var code = codes.filter(function(code){
+                return code.id ===supply.code_id;
+            })[0];
             if(overrideFilename){
                 code.filename = overrideFilename;
             }
 
-            var path = code.prefix + code.filename + code.suffix;
-
-            fs.writeFile(path, code.code, function(err){
-                if(err) throw err;
-                console.log('\nSuccessfully generated!!\n'+path + '\n');
+            var codePath = code.prefix + code.filename + code.suffix;
+            codePath = path.normalize(codePath);
+            var dirPath = path.dirname(codePath);
+            fs.exists(dirPath, function(exists){
+                if(!exists){
+                    fs.mkdirSync(dirPath);
+                }
+                fs.writeFile(codePath, code.code, function(err){
+                    if(err) throw err;
+                    console.log('\nSuccessfully generated!! >> %s\n', codePath);
+                });
             });
         }
     });

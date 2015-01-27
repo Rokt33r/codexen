@@ -26,9 +26,10 @@ var excuteInit = function(depotLabel){
 var fetchDepot = function(depotLabel){
     request.get('http://codexen.dev/cli/depots/' + depotLabel)
         .on('response', function(response) {
-            console.log(response.statusCode) // 200
-            console.log(response.headers['content-type']);
-            console.log(response.constructor.name);
+            //console.log(response.statusCode)
+            //console.log(response.headers['content-type']);
+            //console.log(response.constructor.name);
+            console.log('Successfully generated >> codexen.json file')
         })
         .pipe(fs.createWriteStream('codexen.json'))
 };

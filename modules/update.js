@@ -12,7 +12,7 @@ module.exports = function(){
 
         fs.readFile(path, {encoding: 'utf-8'}, function(err, data){
             if(err) throw err;
-            var depot = JSON.parse(data);
+            var depot = JSON.parse(data).depot;
             fetchDepot(depot.label);
         })
 
