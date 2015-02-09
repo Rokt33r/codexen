@@ -5,7 +5,7 @@
   "main": "index.js",
   "bin": {
     "cx": "./index.js",
-    "cx-config": "./config.js"
+    "cxcx": "./config.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,10 +19,11 @@
   "license": "MIT",
   "dependencies": {
     "commander": "^2.6.0",
+    "execSync": "^1.0.2",
     "request": "^2.51.0"
   },
-  "repository" :
-  { "type" : "git"
-  , "url" : "https://github.com/laravelfanatic/codexen.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laravelfanatic/codexen.git"
   }
 }

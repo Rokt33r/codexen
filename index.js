@@ -4,6 +4,7 @@ var program = require('commander');
 var fs = require('fs');
 var readline = require('readline');
 var path = require('path');
+var execSync = require('execSync');
 
 var supplies, codes;
 
@@ -54,6 +55,10 @@ var executeGenerator = function(command, overrideFilename){
                 code.filename = overrideFilename;
             }
 
+            console.log(supply.intro);
+            var output = execSync.exec(supply.intro);
+            console.log(output.stdout);
+
             var codePath = code.prefix + code.filename + code.suffix;
             codePath = path.normalize(codePath);
             var dirPath = path.dirname(codePath);
@@ -63,7 +68,11 @@ var executeGenerator = function(command, overrideFilename){
                 }
                 fs.writeFile(codePath, code.code, function(err){
                     if(err) throw err;
-                    console.log('\nSuccessfully generated!! >> %s\n', codePath);
+                    console.log('Successfully generated!! >> %s\n', codePath);
+
+                    console.log(supply.outro);
+                    var output = execSync.exec(supply.outro);
+                    console.log(output.stdout);
                 });
             });
         }

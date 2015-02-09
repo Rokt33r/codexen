@@ -1,3 +1,3 @@
 # CodeXen CLI
 
-on prototyping...
+## File templating & Task runner
