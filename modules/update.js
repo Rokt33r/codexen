@@ -29,7 +29,8 @@ var throwCodexenFileNotFound = function(){
     process.exit();
 };
 var fetchDepot = function(depotLabel){
-    request.get('http://codexen.dev/cli/depots/' + depotLabel)
+    var url = require('./url');
+    request.get(url + depotLabel)
         .on('response', function(response) {
             //console.log(response.statusCode)
             //console.log(response.headers['content-type']);

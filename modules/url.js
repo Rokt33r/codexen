@@ -1,0 +1,1 @@
+module.exports = process.env.NODE_ENV == 'development'?'http://codexen.dev/cli/depots/':'http://codexen.org/cli/depots/';
