@@ -1,6 +1,6 @@
 {
   "name": "codexen",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Code storage service",
   "main": "index.js",
   "bin": {
