@@ -9,7 +9,7 @@ var execSync = require('execSync');
 var supplies, codes;
 
 program
-    .version('0.0.4')
+    .version('0.0.5')
     .parse(process.argv);
 
 
@@ -63,15 +63,13 @@ var generateCode = function(supply, overrideFilename){
     var codePath = code.prefix + code.filename + code.suffix;
     codePath = path.normalize(codePath);
     var dirPath = path.dirname(codePath);
-    fs.exists(dirPath, function(exists){
-        if(!exists){
-            fs.mkdirSync(dirPath);
-        }
-        fs.writeFile(codePath, code.code, function(err){
-            if(err) throw err;
-            console.log('Successfully generated!! >> %s\n', codePath);
-        });
-    });
+
+    var exists = fs.existsSync(dirPath);
+    if(!exists){
+        fs.mkdirSync(dirPath);
+    }
+    fs.writeFileSync(codePath, code.code);
+    console.log('Successfully generated!! >> %s\n', codePath);
 };
 
 var runCode = function(supply){
@@ -96,10 +94,11 @@ var runCode = function(supply){
             runtime = '#!/usr/bin/env php';
             break;
         default :
-            console.log('CodeXen runner can execute Shell, Javascript(NodeJS), PHP only');
-            return;
+            break;
     }
     if(supply.override) runtime = supply.override;
+
+    if(!runtime) console.log('CodeXen runner can execute Shell, Javascript(NodeJS), PHP only');
 
     console.log('runtime >> ' +runtime);
 
