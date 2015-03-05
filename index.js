@@ -9,7 +9,7 @@ var execSync = require('execSync');
 var supplies, codes;
 
 program
-    .version('0.0.1')
+    .version('0.0.4')
     .parse(process.argv);
 
 
@@ -21,7 +21,7 @@ fs.readFile('./codexen.json', {encoding: 'utf-8'}, function (err, data) {
     codes = result.codes;
 
     if(program.args[0]) {
-        executeGenerator(program.args[0], program.args[1]);
+        execute(program.args[0], program.args[1]);
     }else{
         console.log('Thanks for using CodeXen');
         console.log('\nAvailable commands are below. :)\n');
@@ -36,45 +36,85 @@ fs.readFile('./codexen.json', {encoding: 'utf-8'}, function (err, data) {
         });
         rl.question("Choose the command to execute >> ", function(answer){
             var command = answer;
-            rl.question("Choose filename (default) >> ", function(answer) {
-                console.log(answer);
-                executeGenerator(command, answer);
-            });
+            execute(command);
         });
 
     }
 });
 
-var executeGenerator = function(command, overrideFilename){
+var execute = function(command, overrideFilename){
     supplies.forEach(function (supply) {
         if (supply.command == command) {
-            var code = codes.filter(function(code){
-                return code.id ===supply.code_id;
-            })[0];
-            if(overrideFilename){
-                code.filename = overrideFilename;
-            }
-
-            console.log(supply.intro);
-            var output = execSync.exec(supply.intro);
-            console.log(output.stdout);
-
-            var codePath = code.prefix + code.filename + code.suffix;
-            codePath = path.normalize(codePath);
-            var dirPath = path.dirname(codePath);
-            fs.exists(dirPath, function(exists){
-                if(!exists){
-                    fs.mkdirSync(dirPath);
-                }
-                fs.writeFile(codePath, code.code, function(err){
-                    if(err) throw err;
-                    console.log('Successfully generated!! >> %s\n', codePath);
-
-                    console.log(supply.outro);
-                    var output = execSync.exec(supply.outro);
-                    console.log(output.stdout);
-                });
-            });
+            if(supply.type=='generator') generateCode(supply, overrideFilename);
+            if(supply.type=='runner') runCode(supply, overrideFilename);
+            if(supply.type=='group') runGroup(supply);
         }
+    });
+};
+
+var generateCode = function(supply, overrideFilename){
+    var code = codes.filter(function(code){
+        return code.id ===supply.code_id;
+    })[0];
+    if(overrideFilename){
+        code.filename = overrideFilename;
+    }
+
+    var codePath = code.prefix + code.filename + code.suffix;
+    codePath = path.normalize(codePath);
+    var dirPath = path.dirname(codePath);
+    fs.exists(dirPath, function(exists){
+        if(!exists){
+            fs.mkdirSync(dirPath);
+        }
+        fs.writeFile(codePath, code.code, function(err){
+            if(err) throw err;
+            console.log('Successfully generated!! >> %s\n', codePath);
+        });
+    });
+};
+
+var runCode = function(supply){
+    var code = codes.filter(function(code){
+        return code.id ===supply.code_id;
+    })[0];
+
+    var codePath = code.prefix + code.filename + code.suffix;
+    codePath = path.normalize(codePath);
+    var ext = path.extname(codePath);
+
+    var runtime;
+
+    switch(ext) {
+        case '.sh':
+            runtime = '#!/usr/bin/env sh';
+            break;
+        case '.js':
+            runtime = '#!/usr/bin/env node';
+            break;
+        case '.php':
+            runtime = '#!/usr/bin/env php';
+            break;
+        default :
+            console.log('CodeXen runner can execute Shell, Javascript(NodeJS), PHP only');
+            return;
+    }
+    if(supply.override) runtime = supply.override;
+
+    console.log('runtime >> ' +runtime);
+
+    code = runtime + '\n' + code.code;
+
+    var runnable = fs.writeFileSync('codexen.lock', code);
+    execSync.exec('chmod 777 codexen.lock');
+    var output = execSync.exec('./codexen.lock');
+    console.log(output.stdout);
+};
+
+var runGroup = function(supply){
+    console.log(supply.supplies);
+    supply.supplies.forEach(function (supply) {
+        if(supply.type=='generator') generateCode(supply);
+        if(supply.type=='runner') runCode(supply);
     });
 };
