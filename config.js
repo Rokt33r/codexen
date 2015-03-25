@@ -3,7 +3,7 @@
 var program = require('commander');
 
 program
-    .version('0.0.5')
+    .version('0.0.6')
 
 program
     .command('init [depotLabel]')

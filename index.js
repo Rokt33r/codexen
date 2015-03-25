@@ -4,12 +4,18 @@ var program = require('commander');
 var fs = require('fs');
 var readline = require('readline');
 var path = require('path');
-var execSync = require('execSync');
+var execSync;
+
+if(process.version.match(/0.12/)){
+    execSync = require('child_process').execSync;
+}else{
+    execSync = require('execSync').exec;
+}
 
 var supplies, codes;
 
 program
-    .version('0.0.5')
+    .version('0.0.6')
     .parse(process.argv);
 
 
@@ -105,9 +111,15 @@ var runCode = function(supply){
     code = runtime + '\n' + code.code;
 
     var runnable = fs.writeFileSync('codexen.lock', code);
-    execSync.exec('chmod 777 codexen.lock');
-    var output = execSync.exec('./codexen.lock');
-    console.log(output.stdout);
+    execSync('chmod 777 codexen.lock');
+    var output = execSync('./codexen.lock');
+
+    if(process.version.match(/0.12/)){
+        console.log(output.toString('utf-8'));
+    }else{
+        console.log(output.stdout);
+    }
+
 };
 
 var runGroup = function(supply){
