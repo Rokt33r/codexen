@@ -15,7 +15,7 @@ if(process.version.match(/0.12/)){
 var supplies, codes;
 
 program
-    .version('0.0.6')
+    .version('0.0.7')
     .parse(process.argv);
 
 

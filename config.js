@@ -3,7 +3,7 @@
 var program = require('commander');
 
 program
-    .version('0.0.6')
+    .version('0.0.7')
 
 program
     .command('init [depotLabel]')
@@ -23,6 +23,6 @@ if(!program.args.length) {
     console.log(' / /  / _ \\ / _` |/ _ \\\\  // _ \\ \'_ \\ ');
     console.log('/ /__| (_) | (_| |  __//  \\  __/ | | |');
     console.log('\\____/\\___/ \\__,_|\\___/_/\\_\\___|_| |_|');
-    console.log('Prototype v0.0.5');
+    console.log('Prototype v0.0.7');
     program.help();
 }
