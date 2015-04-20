@@ -12,8 +12,8 @@ module.exports = function(){
 
         fs.readFile(path, {encoding: 'utf-8'}, function(err, data){
             if(err) throw err;
-            var depot = JSON.parse(data).depot;
-            fetchDepot(depot.label);
+            var deck = JSON.parse(data).deck;
+            fetchDepot(deck.label);
         })
 
     });
@@ -28,9 +28,9 @@ var throwCodexenFileNotFound = function(){
     console.error('use \'cx-config init\' to make codexen.json\n');
     process.exit();
 };
-var fetchDepot = function(depotLabel){
-    var url = require('./url');
-    request.get(url + depotLabel)
+var fetchDepot = function(deckLabel){
+    var url = require('./url') + 'decks/' + deckLabel;
+    request.get(url)
         .on('response', function(response) {
             //console.log(response.statusCode)
             //console.log(response.headers['content-type']);

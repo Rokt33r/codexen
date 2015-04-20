@@ -12,10 +12,10 @@ if(process.version.match(/0.12/)){
     execSync = require('execSync').exec;
 }
 
-var supplies, codes;
+var commandCards, cards;
 
 program
-    .version('0.0.7')
+    .version('0.0.8')
     .parse(process.argv);
 
 
@@ -23,8 +23,8 @@ program
 fs.readFile('./codexen.json', {encoding: 'utf-8'}, function (err, data) {
     if (err) throw err;
     var result = JSON.parse(data);
-    supplies = result.depot.supplies;
-    codes = result.codes;
+    commandCards = result.deck.cards;
+    cards = result.cards;
 
     if(program.args[0]) {
         execute(program.args[0], program.args[1]);
@@ -32,8 +32,8 @@ fs.readFile('./codexen.json', {encoding: 'utf-8'}, function (err, data) {
         console.log('Thanks for using CodeXen');
         console.log('\nAvailable commands are below. :)\n');
 
-        supplies.forEach(function (supply) {
-            console.log(supply.command);
+        commandCards.forEach(function (card) {
+            console.log(card.command);
         });
 
         var rl = readline.createInterface({
@@ -49,24 +49,24 @@ fs.readFile('./codexen.json', {encoding: 'utf-8'}, function (err, data) {
 });
 
 var execute = function(command, overrideFilename){
-    supplies.forEach(function (supply) {
-        if (supply.command == command) {
-            if(supply.type=='generator') generateCode(supply, overrideFilename);
-            if(supply.type=='runner') runCode(supply, overrideFilename);
-            if(supply.type=='group') runGroup(supply);
+    commandCards.forEach(function (commandCard) {
+        if (commandCard.command == command) {
+            if(commandCard.type=='generator') generateCode(commandCard, overrideFilename);
+            if(commandCard.type=='runner') runCode(commandCard, overrideFilename);
+            if(commandCard.type=='group') runGroup(commandCard);
         }
     });
 };
 
-var generateCode = function(supply, overrideFilename){
-    var code = codes.filter(function(code){
-        return code.id ===supply.code_id;
+var generateCode = function(commandCard, overrideFilename){
+    var targetCard = cards.filter(function(card){
+        return card.id ===commandCard.card_id;
     })[0];
     if(overrideFilename){
-        code.filename = overrideFilename;
+        targetCard.filename = overrideFilename;
     }
 
-    var codePath = code.prefix + code.filename + code.suffix;
+    var codePath = targetCard.filename;
     codePath = path.normalize(codePath);
     var dirPath = path.dirname(codePath);
 
@@ -74,16 +74,16 @@ var generateCode = function(supply, overrideFilename){
     if(!exists){
         fs.mkdirSync(dirPath);
     }
-    fs.writeFileSync(codePath, code.code);
+    fs.writeFileSync(codePath, targetCard.code);
     console.log('Successfully generated!! >> %s\n', codePath);
 };
 
-var runCode = function(supply){
-    var code = codes.filter(function(code){
-        return code.id ===supply.code_id;
+var runCode = function(commandCard){
+    var targetCard = cards.filter(function(card){
+        return card.id ===commandCard.card_id;
     })[0];
 
-    var codePath = code.prefix + code.filename + code.suffix;
+    var codePath = targetCard.filename;
     codePath = path.normalize(codePath);
     var ext = path.extname(codePath);
 
@@ -102,16 +102,16 @@ var runCode = function(supply){
         default :
             break;
     }
-    if(supply.override) runtime = supply.override;
+    if(commandCard.runtime) runtime = commandCard.runtime;
 
     if(!runtime) console.log('CodeXen runner can execute Shell, Javascript(NodeJS), PHP only');
 
     console.log('runtime >> ' +runtime);
 
-    code = runtime + '\n' + code.code;
+    var code = runtime + '\n' + targetCard.code;
 
     var runnable = fs.writeFileSync('codexen.lock', code);
-    execSync('chmod 777 codexen.lock');
+    execSync('chmod 700 codexen.lock');
     var output = execSync('./codexen.lock');
 
     if(process.version.match(/0.12/)){
@@ -122,10 +122,9 @@ var runCode = function(supply){
 
 };
 
-var runGroup = function(supply){
-    console.log(supply.supplies);
-    supply.supplies.forEach(function (supply) {
-        if(supply.type=='generator') generateCode(supply);
-        if(supply.type=='runner') runCode(supply);
+var runGroup = function(groupCard){
+    groupCard.cards.forEach(function (card) {
+        if(card.type=='generator') generateCode(card);
+        if(card.type=='runner') runCode(card);
     });
 };

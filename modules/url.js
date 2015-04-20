@@ -1,1 +1,1 @@
-module.exports = 'http://codexen.org/cli/depots/';
+module.exports = 'http://api.codexen.org/v0/';

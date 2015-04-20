@@ -24,8 +24,8 @@ var excuteInit = function(depotLabel){
     fetchDepot(depotLabel);
 };
 var fetchDepot = function(depotLabel){
-    var url = require('./url');
-    request.get(url + depotLabel)
+    var url = require('./url') + 'decks/' + depotLabel;
+    request.get(url)
         .on('response', function(response) {
             //console.log(response.statusCode)
             //console.log(response.headers['content-type']);
